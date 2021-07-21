@@ -1,0 +1,165 @@
+import os
+import subprocess
+import pyautogui
+from time import sleep
+from selenium import webdriver
+import os.path
+import zipfile
+import shutil
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+from selenium.webdriver.chrome.options import Options
+
+#1.deletando arquivos (NE, NC e Plailhao) do VS Code
+if os.path.exists("D:\\prog\\r_uno\\NE.csv"):
+    os.remove("D:\\prog\\r_uno\\NE.csv")
+
+if os.path.exists("D:\\prog\\r_uno\\NC.csv"):
+    os.remove("D:\\prog\\r_uno\\NC.csv")
+
+if os.path.exists("D:\\prog\\r_uno\\planilhao_ug_160457.csv"):
+    os.remove("D:\\prog\\r_uno\\planilhao_ug_160457.csv")
+
+#2.conectnado vpn
+subprocess.Popen('E:\\Program Files\\ipseca.exe')
+sleep(1)
+pyautogui.press('down', presses=2)
+pyautogui.press('alt')
+pyautogui.press('down')
+pyautogui.press('enter')
+sleep(1)
+pyautogui.write('0130573249')
+pyautogui.press('tab')
+pyautogui.write('Julian@01')
+pyautogui.press('tab')
+pyautogui.press('enter')
+sleep(4)
+
+
+#3.conectando ao sag e baixando (NE, NC e planilhao)
+#conectando ao sag
+driver = webdriver.Chrome(executable_path=r"D:\\prog\\r_uno\\chromedriver.exe")
+driver.get("http://sag.2icfex.eb.mil.br/sag2021/")
+driver.find_element_by_xpath('/html/body/div[2]/div/div/div[1]/button/span').click() #Fechar
+sleep(0.3)
+driver.find_element_by_xpath('//*[@id="login"]').click() #Login
+sleep(1)
+driver.find_element_by_id('cpf').send_keys('28593345808') #CPF
+sleep(0.3)
+driver.find_element_by_id('senha').send_keys('309159') #senha
+sleep(0.3)
+driver.find_element_by_xpath('//*[@id="btn"]').click() #entrar
+sleep(18)
+
+#atualizando a página
+driver.current_url
+driver.find_element_by_xpath('/html/body/div[1]/div/div/div[3]/div/div/div[1]/button/span').click()
+sleep(0.3)
+
+#baixando NE
+driver.current_url
+driver.find_element_by_xpath('/html/body/div[1]/div/div/nav/div/div[2]/ul[1]/li/div[1]/button').click() #siafi/gestao
+sleep(0.3)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/nav/div/div[2]/ul[1]/li/div[1]/ul/li[3]/a').click() #documentos
+sleep(0.3)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/div[1]/div/div/button[2]').click() #ne
+sleep(0.3)
+driver.find_element_by_xpath('//*[@id="dataini"]').send_keys('01/01/2021') #data inicial
+sleep(0.3)
+driver.find_element_by_xpath('//*[@id="datafim"]').send_keys('31/12/2021') #data final
+sleep(0.3)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/div[1]/div/div/div[2]/div/div/div[3]/div/div/button').click() #entrar
+sleep(0.8)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/div[5]/div/div[2]/div/div[1]/div[1]/label/select/option[11]').click() #qnt linhas
+sleep(0.3)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/div[5]/div/div[1]/button[3]').click() #csv
+sleep(3)
+
+#baixando NC
+driver.find_element_by_xpath('/html/body/div[1]/div/div/nav/div/div[2]/ul[1]/li/div[1]/button').click() #siafi/gestao
+sleep(0.3)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/nav/div/div[2]/ul[1]/li/div[1]/ul/li[3]/a').click() #documentos
+sleep(0.3)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/div[1]/div/div/button[1]').click() #nc
+sleep(1)
+driver.find_element_by_xpath('//*[@id="dataininc"]').send_keys('01/01/2021') #data inicial
+sleep(0.3)
+driver.find_element_by_xpath('//*[@id="datafimnc"]').send_keys('31/12/2021') #data final
+sleep(0.3)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/div[1]/div/div/div[1]/div/div/div[3]/div/div/button').click() #enviar
+sleep(0.8)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/div[5]/div/div[2]/div/div[1]/div[1]/label/select/option[11]').click() #qnt linhas
+sleep(0.3)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/div[5]/div/div[1]/button[3]').click() #csv
+sleep(3)
+
+#baixando planilhao
+driver.find_element_by_xpath('/html/body/div[1]/div/div/nav/div/div[2]/ul[1]/li/div[1]/button').click() #siafi/gestao
+sleep(0.3)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/nav/div/div[2]/ul[1]/li/div[1]/ul/li[21]/a').click() #planilhao
+sleep(0.3)
+driver.find_element_by_xpath('/html/body/div[1]/div/div/div[1]/div/form/fieldset/div/div/select/option[2]').click() #selecione UG
+sleep(3)
+driver.quit()
+
+#4.desconecta vpn
+subprocess.Popen('E:\\Program Files\\ipseca.exe')
+sleep(1)
+pyautogui.press('alt')
+pyautogui.press('down')
+pyautogui.press('enter')
+sleep(1)
+pyautogui.press('enter')
+sleep(1)
+
+pyautogui.write('0130573249')
+pyautogui.press('tab')
+pyautogui.write('Julian@01')
+pyautogui.press('tab')
+pyautogui.press('enter')
+sleep(4)
+
+#2_renomeando (Manfrini -> NE, NC e planilhao)
+if(os.path.isfile('C:\\Users\MAJOR CAMARATA\\Downloads\\planilhao_ug_160457.zip')):
+    zip = zipfile.ZipFile('C:\\Users\MAJOR CAMARATA\\Downloads\\planilhao_ug_160457.zip')
+    zip.extractall()
+    zip.close
+else:
+    print("planilhão não existe")
+
+if(os.path.isfile('C:\\Users\MAJOR CAMARATA\\Downloads\\Ten Cel Manfrini.csv')):
+    shutil.move(r'C:\\Users\\MAJOR CAMARATA\\Downloads\\Ten Cel Manfrini.csv',r'D:\prog\r_uno\NE.csv')
+else:
+    print("NE não existe")
+
+if(os.path.isfile('C:\\Users\\MAJOR CAMARATA\\Downloads\\Ten Cel Manfrini (1).csv')):
+   shutil.move(r'C:\\Users\\MAJOR CAMARATA\\Downloads\\Ten Cel Manfrini (1).csv',r'D:\prog\r_uno\NC.csv')
+else:
+    print("NC não existe")
+
+#5_carregando NE
+scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
+         "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
+
+credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+client = gspread.authorize(credentials)
+
+spreadsheet = client.open('NE')
+
+with open('NE.csv', encoding="Latin-1") as file_obj:
+    content = file_obj.read()
+    client.import_csv(spreadsheet.id, data=content)
+
+#6_carregando NC
+spreadsheet = client.open('NC')
+
+with open('NC.csv', encoding="Latin-1") as file_obj:
+    content = file_obj.read()
+    client.import_csv(spreadsheet.id, data=content)
+
+#7_carregando planilhao
+spreadsheet = client.open('planilhao')
+
+with open('planilhao_ug_160457.csv', encoding="Latin-1") as file_obj:
+    content = file_obj.read()
+    client.import_csv(spreadsheet.id, data=content)
